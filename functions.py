@@ -27,3 +27,14 @@ def team_players(team_name):
         player_nicknames[key.text] = roles[o]
         o += 1
     return player_nicknames
+
+
+def player_nickname_to_lol_nickname(player):
+    page_url = 'https://lolpros.gg/player/%s' % player
+    page = requests.get(page_url)
+    soup = BeautifulSoup(page.content, 'html.parser')
+    lol_nicknames = soup.find_all("div", class_="summoner-name")[0]
+    lol_nickname = lol_nicknames.find("p").text
+    return lol_nickname
+
+print(player_nickname_to_lol_nickname("Wunder"))
