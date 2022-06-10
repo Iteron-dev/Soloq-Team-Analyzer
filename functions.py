@@ -1,6 +1,14 @@
 import requests
 from bs4 import BeautifulSoup
+import json
 
+requests.packages.urllib3.disable_warnings()
+
+# api key
+with open('config.json') as conf:
+    config_data = json.load(conf)
+
+api_key = config_data['api_Key']
 
 def team_players(team_name):
     page_url = 'https://lol.fandom.com/wiki/%s' % team_name
@@ -37,4 +45,14 @@ def player_nickname_to_lol_nickname(player):
     lol_nickname = lol_nicknames.find("p").text
     return lol_nickname
 
-print(player_nickname_to_lol_nickname("Wunder"))
+
+def lol_nick_to_puuid(nick):
+    url = 'https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-name/%s' % nick
+
+    response_puiid = requests.get(
+        url,
+        headers={'X-Riot-Token': api_key},
+        verify=False
+    )
+
+    return response_puiid.json()["puuid"]
