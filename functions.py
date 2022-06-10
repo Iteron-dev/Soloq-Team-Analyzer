@@ -10,6 +10,7 @@ with open('config.json') as conf:
 
 api_key = config_data['api_Key']
 
+
 def team_players(team_name):
     page_url = 'https://lol.fandom.com/wiki/%s' % team_name
     page = requests.get(page_url)
@@ -49,10 +50,34 @@ def player_nickname_to_lol_nickname(player):
 def lol_nick_to_puuid(nick):
     url = 'https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-name/%s' % nick
 
-    response_puiid = requests.get(
+    response_puuid = requests.get(
         url,
         headers={'X-Riot-Token': api_key},
         verify=False
     )
 
-    return response_puiid.json()["puuid"]
+    return response_puuid.json()["puuid"]
+
+
+def matches_ago(puuid, unix_start_time):
+    def next_matches(start, end):
+        url = 'https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/%s/ids?startTime=%s&queue=420&start=%s&count=%s' % (
+            puuid, unix_start_time, start, end)
+        response_ago = requests.get(
+            url,
+            headers={'X-Riot-Token': api_key},
+            verify=False
+        )
+
+        return response_ago.json()
+
+    empty_list = []
+    start = 0
+    count = 100
+    matches_ago = next_matches(start, count)
+    while next_matches(start, count) != empty_list:
+        start += 100
+        matches_ago.extend(next_matches(start, count))
+
+    return matches_ago
+
