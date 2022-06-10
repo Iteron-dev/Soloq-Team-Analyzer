@@ -1,6 +1,9 @@
 import requests
 from bs4 import BeautifulSoup
 import json
+from time import sleep
+from datetime import datetime
+from datetime import timedelta
 
 requests.packages.urllib3.disable_warnings()
 
@@ -48,6 +51,7 @@ def player_nickname_to_lol_nickname(player):
 
 
 def lol_nick_to_puuid(nick):
+    sleep(1.2)
     url = 'https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-name/%s' % nick
     response_puuid = requests.get(
         url,
@@ -60,6 +64,7 @@ def lol_nick_to_puuid(nick):
 
 def matches_ago(puuid, unix_start_time):
     def next_matches(start, end):
+        sleep(1.2)
         url = 'https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/%s/ids?startTime=%s&queue=420&start=%s&count=%s' % (
             puuid, unix_start_time, start, end)
         response_ago = requests.get(
@@ -82,6 +87,7 @@ def matches_ago(puuid, unix_start_time):
 
 
 def match_detail_fun(match_id):
+    sleep(1.2)
     url = 'https://europe.api.riotgames.com/lol/match/v5/matches/%s' % match_id
     response_detail = requests.get(
         url,
@@ -244,9 +250,16 @@ def matches_stats(matches, puuid):
     return champs_all, winratio, kda, minion_per, dmgd_p, gold_p
 
 
-def player_stats(player, days_ago_unix):
+def player_stats(player, days_ago):
+
+    today = datetime.now()
+    n_days = timedelta(days=int(days_ago))
+    n_ago = today - n_days
+    unix_timestamp_nd = datetime.timestamp(n_ago)
+    n_ago_unix = str(round(unix_timestamp_nd))
+
     lol_nickname = player_nickname_to_lol_nickname(player)
     puuid = lol_nick_to_puuid(lol_nickname)
-    matches = matches_ago(puuid, days_ago_unix)
+    matches = matches_ago(puuid, n_ago_unix)
 
     return matches_stats(matches, puuid)
