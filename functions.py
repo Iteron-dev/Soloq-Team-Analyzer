@@ -49,7 +49,6 @@ def player_nickname_to_lol_nickname(player):
 
 def lol_nick_to_puuid(nick):
     url = 'https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-name/%s' % nick
-
     response_puuid = requests.get(
         url,
         headers={'X-Riot-Token': api_key},
@@ -81,3 +80,13 @@ def matches_ago(puuid, unix_start_time):
 
     return matches_ago
 
+
+def match_detail(match_id):
+    url = 'https://europe.api.riotgames.com/lol/match/v5/matches/%s' % match_id
+    response_detail = requests.get(
+        url,
+        headers={'X-Riot-Token': api_key},
+        verify=False
+    )
+
+    return response_detail.json()
