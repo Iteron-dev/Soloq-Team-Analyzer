@@ -14,10 +14,13 @@ for player in team_players(team_name):
     df_t.name = player
     df_list.append(df_t)
 
-excel_filename = input("Please type file name (with .xlsx file format: ")
+excel_filename = input("Please type file name (with .xlsx file format): ")
 
-with pd.ExcelWriter(excel_filename) as writer:
-    for df in df_list:
-        df.to_excel(writer, sheet_name=df.name)
+try:
+    with pd.ExcelWriter(excel_filename) as writer:
+        for df in df_list:
+            df.to_excel(writer, sheet_name=df.name)
+        print("Excel file created!")
+except ValueError:
+    print("File name without .xlsx file format")
 
-print("Excel file created!")

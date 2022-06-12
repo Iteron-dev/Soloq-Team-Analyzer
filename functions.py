@@ -4,6 +4,7 @@ import json
 from time import sleep
 from datetime import datetime
 from datetime import timedelta
+import sys
 
 requests.packages.urllib3.disable_warnings()
 
@@ -21,8 +22,11 @@ def team_players(team_name):
     soup = BeautifulSoup(page.content, 'html.parser')
 
     tab = soup.find("table", {"class": "wikitable sortable team-members hoverable-rows team-members-current"})
-
-    players = tab.find_all("td", class_="team-members-player")
+    try:
+        players = tab.find_all("td", class_="team-members-player")
+    except AttributeError:
+        print("Incorrect team name!")
+        sys.exit()
     role_player = tab.find_all("td", class_="team-members-role")
     player_nicknames = {}
     roles = []
@@ -45,7 +49,12 @@ def player_nickname_to_lol_nickname(player):
     page_url = 'https://lolpros.gg/player/%s' % player
     page = requests.get(page_url)
     soup = BeautifulSoup(page.content, 'html.parser')
-    lol_nicknames = soup.find_all("div", class_="summoner-name")[0]
+    try:
+        lol_nicknames = soup.find_all("div", class_="summoner-name")[0]
+    except IndexError:
+        print("Player lolpros.gg is invalid, type '%s' LoL account manually:" % player)
+        lol_nickname = input()
+        return lol_nickname
     lol_nickname = lol_nicknames.find("p").text
     return lol_nickname
 
